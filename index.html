@@ -186,7 +186,7 @@ return {total,orders};
 function run(){
 
 if(!upper.value||!lower.value||!grid.value||!lot.value){
-alert("กรุณากรอก: กรอบบน/ล่าง + grid + lot");
+alert("กรุณากรอก: กรอบราคาบน ,กรอบราคาล่าง,ระยะ grid,lotsize");
 return;
 }
 
@@ -216,7 +216,7 @@ drawGrid(u,l,g);
 function findOptimal(){
 
 if(!upper.value||!lower.value||!lot.value||!balance.value){
-alert("กรุณากรอก: balance + lot + กรอบบน/ล่าง");
+alert("กรุณากรอก: balance,lotsize,กรอบราคาบน,กรอบราคาล่าง");
 return;
 }
 
