@@ -133,7 +133,7 @@ button {
 </div>
 
 <button onclick="run()">คำนวณ</button>
-<button onclick="findOptimal()">🔥 Optimal</button>
+<button onclick="findOptimal()">🔥 Grid Optimal</button>
 <button onclick="resetAll()">🔄 Reset</button>
 
 <div class="result-box" id="result"></div>
@@ -204,7 +204,7 @@ result.innerHTML=`
 📌 ${orders} ไม้<br>
 📦 Lotsize: ${lotv}<br>
 📏 ระยะGrid: ${g}<br>
-💰กำไร/ช่อง: ${(g*per).toFixed(2)}<br>
+💰 กำไร/ช่อง: ${(g*per).toFixed(2)}<br>
 🔻 DrawDown: ${total.toFixed(2)}<br>
 💵 ใช้เงิน: ${total.toFixed(2)}
 `;
