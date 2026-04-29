@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Grid Trading Dashboard</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0b0f1a;
+    color: #fff;
+}
+
+.container {
+    display: flex;
+}
+
+/* LEFT PANEL */
+.sidebar {
+    width: 300px;
+    background: #111827;
+    padding: 20px;
+    border-right: 1px solid #333;
+}
+
+.sidebar h2 {
+    color: #4ade80;
+}
+
+input, select, button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    border-radius: 6px;
+    border: none;
+}
+
+input {
+    background: #020617;
+    color: #fff;
+}
+
+input::placeholder {
+    color: #777;
+}
+
+button {
+    background: #22c55e;
+    color: #fff;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+/* RESULT BOX */
+.result-box {
+    margin-top: 20px;
+    background: #020617;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #333;
+}
+
+/* MAIN */
+.main {
+    flex: 1;
+    padding: 20px;
+    position: relative;
+}
+
+/* GRID AREA */
+.grid-area {
+    position: relative;
+    height: 600px;
+    border-left: 2px solid #fff;
+}
+
+/* GRID LINE */
+.grid-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-top: 1px dashed #22c55e;
+}
+
+/* BUY POINT */
+.buy {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #facc15;
+}
+
+/* LABELS */
+.label {
+    position: absolute;
+    right: 10px;
+    font-size: 14px;
+    display: none;
+}
+
+.top-label {
+    color: red;
+    top: 0;
+}
+
+.bottom-label {
+    color: #22c55e;
+    bottom: 0;
+}
+
+/* INFO BOX (ย้ายล่างซ้าย) */
+.info {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+    background: #1e1b4b;
+    padding: 15px;
+    border-radius: 10px;
+    width: 220px;
+}
+
+/* SUMMARY */
+.summary {
+    margin-top: 20px;
+    background: #111;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid gold;
+}
+
+/* WARNING */
+.warning {
+    margin-top: 15px;
+    background: #0f172a;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #38bdf8;
+    color: #38bdf8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- LEFT -->
+<div class="sidebar">
+    <h2>📊 Grid Trading Calculator</h2>
+
+    <label>ประเภทพอร์ต</label>
+    <select id="type">
+        <option value="standard">Standard</option>
+        <option value="micro">Micro</option>
+    </select>
+
+    <label>กรอบบน</label>
+    <input type="number" id="upper" placeholder="ex. 5000">
+
+    <label>กรอบล่าง</label>
+    <input type="number" id="lower" placeholder="ex. 4000">
+
+    <label>ระยะกริด</label>
+    <input type="number" id="grid" placeholder="ex. 30">
+
+    <label>Lot Size</label>
+    <input type="number" id="lot" placeholder="ex. 0.01">
+
+    <button onclick="run()">คำนวณ</button>
+
+    <div class="result-box" id="result"></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<h2 style="color:#facc15;">ตัวอย่างการวาง Grid Buy</h2>
+
+<div class="grid-area" id="gridArea">
+
+    <div class="label top-label" id="topLabel"></div>
+    <div class="label bottom-label" id="bottomLabel"></div>
+
+    <!-- INFO ย้ายล่างซ้าย -->
+    <div class="info">
+        <b>หลักการทำงาน</b><br><br>
+        ราคาลง → Buy<br>
+        ราคาขึ้น → ปิดกำไร<br>
+        กำไรทีละช่อง (Grid)
+    </div>
+
+</div>
+
+<div class="summary" id="summary"></div>
+
+<div class="warning">
+หากราคาต่ำกว่าโซนล่าง จะเกิด Drawdown สูง (Cut Loss)
+</div>
+
+</div>
+</div>
+
+<script>
+
+function run() {
+
+    let upper = +document.getElementById("upper").value;
+    let lower = +document.getElementById("lower").value;
+    let grid = +document.getElementById("grid").value;
+    let lot = +document.getElementById("lot").value;
+    let type = document.getElementById("type").value;
+
+    if (!upper || !lower || !grid || !lot) {
+        alert("กรุณากรอกข้อมูลให้ครบ");
+        return;
+    }
+
+    let range = upper - lower;
+    let orders = Math.floor(range / grid) + 1;
+
+    let perPoint = (type === "micro")
+        ? (lot * 100) / 100
+        : (lot * 100);
+
+    let totalLoss = 0;
+
+    for (let i = 0; i < orders; i++) {
+        totalLoss += i * grid * perPoint;
+    }
+
+    document.getElementById("result").innerHTML = `
+        📌 จำนวนไม้: ${orders}<br>
+        💰 P/L ต่อจุด: ${perPoint.toFixed(2)} USD<br>
+        🔻 DD สูงสุด: ${totalLoss.toFixed(2)} USD
+    `;
+
+    // ✅ แสดง label หลังคำนวณ
+    let topLabel = document.getElementById("topLabel");
+    let bottomLabel = document.getElementById("bottomLabel");
+
+    topLabel.style.display = "block";
+    bottomLabel.style.display = "block";
+
+    topLabel.innerHTML = "กรอบบน " + upper;
+    bottomLabel.innerHTML = "กรอบล่าง " + lower;
+
+    drawGrid(upper, lower, grid);
+}
+
+function drawGrid(upper, lower, grid) {
+
+    let area = document.getElementById("gridArea");
+
+    // ลบของเก่า
+    document.querySelectorAll(".grid-line, .buy").forEach(e => e.remove());
+
+    let height = 600;
+    let range = upper - lower;
+
+    for (let price = lower; price <= upper; price += grid) {
+
+        let y = height - ((price - lower) / range) * height;
+
+        let line = document.createElement("div");
+        line.className = "grid-line";
+        line.style.top = y + "px";
+
+        let buy = document.createElement("div");
+        buy.className = "buy";
+        buy.style.top = y + "px";
+        buy.innerHTML = "● Buy";
+
+        area.appendChild(line);
+        area.appendChild(buy);
+    }
+}
+
+</script>
+
+</body>
+</html>
