@@ -14,15 +14,12 @@ body {
 
 .container { display: flex; }
 
-/* LEFT PANEL */
+/* LEFT */
 .sidebar {
     width: 300px;
     background: #111827;
     padding: 20px;
-    border-right: 1px solid #333;
 }
-
-.sidebar h2 { color: #4ade80; }
 
 input, select, button {
     width: 100%;
@@ -37,71 +34,77 @@ input {
     color: #fff;
 }
 
-input::placeholder { color: #777; }
-
 button {
     background: #22c55e;
-    color: #fff;
+    color: white;
     cursor: pointer;
 }
 
-.result-box {
-    margin-top: 20px;
-    background: #020617;
-    padding: 15px;
-    border-radius: 10px;
-    border: 1px solid #333;
+/* RIGHT */
+.main {
+    flex: 1;
+    padding: 20px;
+    display: none;
+    position: relative;
 }
 
-/* MAIN */
-.main { flex: 1; padding: 20px; position: relative; }
-
 .grid-area {
-    position: relative;
     height: 600px;
+    position: relative;
     border-left: 2px solid #fff;
 }
 
+/* เส้น grid */
 .grid-line {
     position: absolute;
-    left: 0;
-    right: 0;
+    width: 100%;
     border-top: 1px dashed #22c55e;
 }
 
+/* buy text */
 .buy {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
     color: #facc15;
+    font-size: 13px;
 }
 
+/* หมายเลขไม้ */
+.order-label {
+    position: absolute;
+    left: 10px;
+    color: #22c55e;
+    font-size: 12px;
+}
+
+/* label บนล่าง */
 .label {
     position: absolute;
     right: 10px;
-    font-size: 14px;
     display: none;
 }
 
-.top-label { color: red; top: 0; }
-.bottom-label { color: #22c55e; bottom: 0; }
+.top-label { top: 0; color: red; }
+.bottom-label { bottom: 0; color: green; }
 
-.info {
+/* กล่องหลักการ */
+.info-box {
     position: absolute;
     left: 20px;
     bottom: 20px;
     background: #1e1b4b;
     padding: 15px;
     border-radius: 10px;
-    width: 220px;
+    width: 240px;
+    font-size: 14px;
 }
 
-.warning {
-    margin-top: 15px;
-    background: #0f172a;
+.result-box {
+    margin-top: 20px;
     padding: 15px;
+    background: #020617;
     border-radius: 10px;
-    border: 1px solid #38bdf8;
 }
 </style>
 </head>
@@ -110,60 +113,50 @@ button {
 
 <div class="container">
 
-<!-- LEFT -->
 <div class="sidebar">
-    <h2>📊 Grid Calculator</h2>
+<h2>📊 Grid Calculator</h2>
 
-    <label>ประเภทพอร์ต</label>
-    <select id="type">
-        <option value="standard">Standard</option>
-        <option value="micro">Micro</option>
-    </select>
+<select id="type">
+<option value="standard">Standard</option>
+<option value="micro">Micro</option>
+</select>
 
-    <label>Balance</label>
-    <input type="number" id="balance" placeholder="ex. 10000">
+<input id="balance" placeholder="Balance (ex.10000)">
+<input id="upper" placeholder="กรอบบน (ex.5000)">
+<input id="lower" placeholder="กรอบล่าง (ex.4000)">
+<input id="grid" placeholder="ระยะกริด (ex.30)">
 
-    <label>กรอบบน</label>
-    <input type="number" id="upper" placeholder="ex. 5000">
-
-    <label>กรอบล่าง</label>
-    <input type="number" id="lower" placeholder="ex. 4000">
-
-    <label>ระยะกริด</label>
-    <input type="number" id="grid" placeholder="ex. 30">
-
-    <label>Lot Size</label>
-    <div style="display:flex; gap:5px;">
-        <button onclick="changeLot(-0.01)">-</button>
-        <input type="number" id="lot" placeholder="ex. 0.01" step="0.01">
-        <button onclick="changeLot(0.01)">+</button>
-    </div>
-
-    <button onclick="run()">คำนวณ</button>
-    <button onclick="findOptimal()">🔥 หา Grid Optimal</button>
-
-    <div class="result-box" id="result"></div>
+<div style="display:flex; gap:5px;">
+<button onclick="changeLot(-0.01)">-</button>
+<input id="lot" placeholder="Lot (ex.0.01)">
+<button onclick="changeLot(0.01)">+</button>
 </div>
 
-<!-- MAIN -->
-<div class="main">
+<button onclick="run()">คำนวณ</button>
+<button onclick="findOptimal()">🔥 Optimal</button>
+<button onclick="resetAll()">🔄 Reset</button>
 
-<h2 style="color:#facc15;">Grid Visualization</h2>
+<div class="result-box" id="result"></div>
+</div>
+
+<div class="main" id="main">
+
+<h2>Grid Visualization</h2>
 
 <div class="grid-area" id="gridArea">
-    <div class="label top-label" id="topLabel"></div>
-    <div class="label bottom-label" id="bottomLabel"></div>
 
-    <div class="info">
-        <b>หลักการทำงาน</b><br><br>
-        ราคาลง → Buy<br>
-        ราคาขึ้น → ปิดกำไร<br>
-        กำไรทีละช่อง
-    </div>
+<div class="label top-label" id="topLabel"></div>
+<div class="label bottom-label" id="bottomLabel"></div>
+
+<!-- 💬 หลักการ -->
+<div class="info-box">
+<b>หลักการทำงาน</b><br><br>
+📉 ราคาลง → เปิด Buy เพิ่ม<br>
+📈 ราคาขึ้น → ปิดกำไร<br>
+💰 กำไรทีละช่อง (Grid)<br><br>
+⚠️ หากราคาหลุดโซน → DD สูง
 </div>
 
-<div class="warning">
-ระบบจะพยายามหา grid ที่ใช้เงินคุ้มสุดโดยไม่ล้างพอร์ต
 </div>
 
 </div>
@@ -171,138 +164,156 @@ button {
 
 <script>
 
-// ➕➖ ปรับ lot
-function changeLot(step) {
-    let input = document.getElementById("lot");
-    let value = parseFloat(input.value) || 0;
-    value += step;
-    if (value < 0) value = 0;
-    input.value = value.toFixed(2);
+// lot step
+function changeLot(step){
+let v=parseFloat(lot.value)||0;
+v+=step;
+if(v<0)v=0;
+lot.value=v.toFixed(2);
 }
 
-// คำนวณ DD
-function calcDD(upper, lower, grid, perPoint) {
-    let range = upper - lower;
-    let orders = Math.floor(range / grid) + 1;
-    let total = 0;
-
-    for (let i = 0; i < orders; i++) {
-        total += i * grid * perPoint;
-    }
-    return { total, orders };
+// calc
+function calcDD(u,l,g,p){
+let orders=Math.floor((u-l)/g)+1;
+let total=0;
+for(let i=0;i<orders;i++){
+total+=i*g*p;
+}
+return {total,orders};
 }
 
-function run() {
+// run
+function run(){
 
-    let upper = +upperInput.value;
-    let lower = +lowerInput.value;
-    let grid = +gridInput.value;
-    let lot = +lotInput.value;
-    let type = typeInput.value;
-
-    if (!upper || !lower || !grid || !lot) {
-        alert("กรอกข้อมูลให้ครบ");
-        return;
-    }
-
-    let perPoint = (type === "micro") ? (lot * 100)/100 : (lot * 100);
-
-    let { total, orders } = calcDD(upper, lower, grid, perPoint);
-
-    let profitPerGrid = grid * perPoint;
-
-    result.innerHTML = `
-        📌 จำนวนไม้: ${orders}<br>
-        📦 Lot Size: ${lot}<br>
-        📏 ระยะกริด: ${grid}<br>
-        💰 กำไรต่อช่อง: ${profitPerGrid.toFixed(2)} USD<br>
-        💰 $/point: ${perPoint.toFixed(2)}<br>
-        🔻 DD สูงสุด: ${total.toFixed(2)} USD<br><br>
-        💵 <b>จำนวนเงินที่ต้องใช้:</b><br>
-        ${total.toFixed(2)} USD
-    `;
-
-    topLabel.style.display = "block";
-    bottomLabel.style.display = "block";
-    topLabel.innerHTML = "กรอบบน " + upper;
-    bottomLabel.innerHTML = "กรอบล่าง " + lower;
-
-    drawGrid(upper, lower, grid);
+if(!upper.value||!lower.value||!grid.value||!lot.value){
+alert("กรุณากรอก: กรอบบน/ล่าง + grid + lot");
+return;
 }
 
-// หา grid optimal
-function findOptimal() {
+main.style.display="block";
 
-    let upper = +upperInput.value;
-    let lower = +lowerInput.value;
-    let lot = +lotInput.value;
-    let balance = +balanceInput.value;
-    let type = typeInput.value;
+let u=+upper.value;
+let l=+lower.value;
+let g=+grid.value;
+let lotv=+lot.value;
+let per=(type.value==="micro")?(lotv*100)/100:(lotv*100);
 
-    if (!upper || !lower || !lot || !balance) {
-        alert("กรอกข้อมูลให้ครบ");
-        return;
-    }
+let {total,orders}=calcDD(u,l,g,per);
 
-    let perPoint = (type === "micro") ? (lot * 100)/100 : (lot * 100);
+result.innerHTML=`
+📌 ${orders} ไม้<br>
+📦 Lotsize: ${lotv}<br>
+📏 ระยะGrid: ${g}<br>
+💰กำไร/ช่อง: ${(g*per).toFixed(2)}<br>
+🔻 DrawDown: ${total.toFixed(2)}<br>
+💵 ใช้เงิน: ${total.toFixed(2)}
+`;
 
-    let bestGrid = null;
-    let bestDD = 0;
-
-    for (let g = 10; g <= 200; g += 5) {
-        let { total } = calcDD(upper, lower, g, perPoint);
-
-        if (total <= balance && total > bestDD) {
-            bestDD = total;
-            bestGrid = g;
-        }
-    }
-
-    if (bestGrid) {
-        gridInput.value = bestGrid;
-        run();
-    } else {
-        alert("Balance ไม่พอ");
-    }
+drawGrid(u,l,g);
 }
 
-// วาด grid
-function drawGrid(upper, lower, grid) {
+// optimal
+function findOptimal(){
 
-    document.querySelectorAll(".grid-line, .buy").forEach(e => e.remove());
-
-    let height = 600;
-    let range = upper - lower;
-
-    for (let price = lower; price <= upper; price += grid) {
-
-        let y = height - ((price - lower) / range) * height;
-
-        let line = document.createElement("div");
-        line.className = "grid-line";
-        line.style.top = y + "px";
-
-        let buy = document.createElement("div");
-        buy.className = "buy";
-        buy.style.top = y + "px";
-        buy.innerHTML = "● Buy";
-
-        gridArea.appendChild(line);
-        gridArea.appendChild(buy);
-    }
+if(!upper.value||!lower.value||!lot.value||!balance.value){
+alert("กรุณากรอก: balance + lot + กรอบบน/ล่าง");
+return;
 }
 
-// shorthand
-let upperInput = document.getElementById("upper");
-let lowerInput = document.getElementById("lower");
-let gridInput = document.getElementById("grid");
-let lotInput = document.getElementById("lot");
-let typeInput = document.getElementById("type");
-let balanceInput = document.getElementById("balance");
-let result = document.getElementById("result");
-let gridArea = document.getElementById("gridArea");
-let topLabel = document.getElementById("topLabel");
-let bottomLabel = document.getElementById("bottomLabel");
+main.style.display="block";
+
+let u=+upper.value;
+let l=+lower.value;
+let lotv=+lot.value;
+let bal=+balance.value;
+
+let per=(type.value==="micro")?(lotv*100)/100:(lotv*100);
+
+let best=null;
+let bestDD=0;
+let min=Infinity;
+
+for(let g=10;g<=200;g+=5){
+let {total}=calcDD(u,l,g,per);
+
+if(total<min)min=total;
+
+if(total<=bal && total>bestDD){
+bestDD=total;
+best=g;
+}
+}
+
+if(best){
+grid.value=best;
+run();
+}else{
+result.innerHTML=`
+❗ เงินไม่พอ<br>
+💡 ต้องมีอย่างน้อย:<br>
+${min.toFixed(2)} USD
+`;
+}
+}
+
+// draw grid
+function drawGrid(u,l,g){
+
+document.querySelectorAll(".grid-line,.buy,.order-label").forEach(e=>e.remove());
+
+let h=600;
+let r=u-l;
+let index=1;
+
+for(let p=l;p<=u;p+=g){
+
+let y=h-((p-l)/r)*h;
+
+// เส้น
+let line=document.createElement("div");
+line.className="grid-line";
+line.style.top=y+"px";
+
+// buy text
+let buy=document.createElement("div");
+buy.className="buy";
+buy.style.top=y+"px";
+buy.innerHTML="buy";
+
+// ลำดับไม้
+let label=document.createElement("div");
+label.className="order-label";
+label.style.top=y+"px";
+label.innerHTML="ไม้ " + index;
+
+gridArea.appendChild(line);
+gridArea.appendChild(buy);
+gridArea.appendChild(label);
+
+index++;
+}
+
+// label บนล่าง
+topLabel.style.display="block";
+bottomLabel.style.display="block";
+
+topLabel.innerHTML="บน " + u;
+bottomLabel.innerHTML="ล่าง " + l;
+}
+
+// reset
+function resetAll(){
+
+document.querySelectorAll("input").forEach(i=>i.value="");
+
+result.innerHTML="";
+main.style.display="none";
+
+document.querySelectorAll(".grid-line,.buy,.order-label").forEach(e=>e.remove());
+
+topLabel.style.display="none";
+bottomLabel.style.display="none";
+}
 
 </script>
 
